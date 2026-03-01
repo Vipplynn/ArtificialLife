@@ -1,0 +1,23 @@
+# Build directory
+# This is where CMake generates all the temporary build files and your final executable.
+build/
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# If you compile directly in the root (not recommended), ignore these:
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dylib
+*.dll
+*.exe
