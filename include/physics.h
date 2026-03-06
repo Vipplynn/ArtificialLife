@@ -14,6 +14,10 @@ struct spring {
 
 void verlet(struct body *body, float dt);
 
-struct body stormer_verlet(float pos, float acc, float dt);
+float fast_sqrt(float number);
 
-struct body velocity_verlet(float pos, float acc, float dt);
+void spring(struct spring s);
+
+void ground_friction(struct body *node, float floor_height);
+
+

@@ -54,8 +54,8 @@ void spring(struct spring s){
 }
 
 void ground_friction(struct body *node, float floor_height){
-    if (node->y >= floor_height){ // opposite because top left of window is (0,0) and goes down
-        node->y = floor_height;
+    if (node->y + node->radius >= floor_height){ // opposite because top left of window is (0,0) and goes down
+        node->y = floor_height - node->radius;
 
         float x_prev_new = node->x + (node->prev_x - node->x) * FRICTION_COEFFICIENT;
     
