@@ -23,6 +23,7 @@ int main(int argc, char* argv[]){
         return 1;
     }
 
+
     SDL_Renderer *renderer = NULL;
     renderer = SDL_CreateRenderer(window, NULL);
     while (!done) {
