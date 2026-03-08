@@ -2,7 +2,7 @@
 #include <stdint.h>
 #define FRICTION_COEFFICIENT 0.95f
 #define BOUNCE_FACTOR 0.85f
-#define REPULSION_THRESHOLD 11.00f
+#define REPULSION_THRESHOLD 12.00f
 
 void verlet(struct body *b, float dt){
     float temp_x = b->x;
