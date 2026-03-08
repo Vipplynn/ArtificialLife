@@ -3,6 +3,7 @@
 #include <SDL3/SDL_render.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <math.h>
 
 //#include "../include/physics.h"
 #include "../include/creature.h"
@@ -41,7 +42,9 @@ int main(int argc, char* argv[]){
     float floor_level = 450.0f;
     
     float camera_x = 0.0f;
-
+    float simulation_time = 0.0f;
+    float base_L = creature.spring_arr[0].L;
+    float base_node_x = creature.node_arr[0].x;
     SDL_Renderer *renderer = NULL;
     renderer = SDL_CreateRenderer(window, NULL);
     while (!done) {
@@ -59,13 +62,17 @@ int main(int argc, char* argv[]){
             //ball.acc_y = 9.81f;
             //verlet(&ball, 0.016f);
             //ground_friction(&ball, floor_level);
+            float avg_x = (creature.node_arr[0].x + creature.node_arr[1].x + creature.node_arr[2].x) / 3.0f;
+
+            camera_x = avg_x - 320.f;
 
             for (int i = 0; i < 3; i++){
-                creature.node_arr[i].acc_y = 600.0f;
+                creature.node_arr[i].acc_y = 25.0f;
             }            
             for (int i = 0; i < 3; i++){
                 verlet(&creature.node_arr[i], 0.016f);
-            }            
+            }
+            creature.spring_arr[0].L = base_L + sinf(simulation_time * 5.0f) * 10.0f;
             for (int i = 0; i < 3; i++){
                 spring(creature.spring_arr[i]);
             }
@@ -85,14 +92,14 @@ int main(int argc, char* argv[]){
             // draw ball
             //drawCircle(renderer, (int)(ball.x - camera_x), (int)ball.y, (int)ball.radius);
             for (int i = 0; i < 3; i++){
-                SDL_RenderLine(renderer, creature.spring_arr[i].node_a->x, creature.spring_arr[i].node_a->y, creature.spring_arr[i].node_b->x, creature.spring_arr[i].node_b->y);
+                SDL_RenderLine(renderer, creature.spring_arr[i].node_a->x - camera_x, creature.spring_arr[i].node_a->y, creature.spring_arr[i].node_b->x - camera_x, creature.spring_arr[i].node_b->y);
             }
             for (int i = 0; i < 3; i++){
-                drawCircle(renderer, (int)(creature.node_arr[i].x), (int)creature.node_arr[i].y, (int)creature.node_arr[i].radius);
+                drawCircle(renderer, (int)(creature.node_arr[i].x - camera_x), (int)creature.node_arr[i].y, (int)creature.node_arr[i].radius);
             }
 
-            printf("Node 0 Y: %f\n", creature.node_arr[0].y);
-
+            printf("Node 0 distance travelled: %f\n", creature.node_arr[0].x - base_node_x);
+            simulation_time += 0.016f;
             SDL_RenderPresent(renderer);
 
     }

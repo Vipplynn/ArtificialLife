@@ -1,7 +1,7 @@
 #include "../include/physics.h"
 #include <stdint.h>
 #define FRICTION_COEFFICIENT 0.8f
-#define BOUNCE_FACTOR 0.5f
+#define BOUNCE_FACTOR 0.85f
 
 void verlet(struct body *b, float dt){
     float temp_x = b->x;
