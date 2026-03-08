@@ -31,13 +31,13 @@ A real-time 2D simulation running on Linux via SDL3. A population of creatures i
 | Milestone | Task Description | Status |
 | :--- | :--- | :--- |
 | **1. Foundation** | Initialize SDL3 window, establish the game loop, and implement basic shape rendering (circles and lines). | Complete |
-| **2. Physics Engine** | Develop Verlet integration for node movement, implement spring constraints, gravity, and ground collision detection. | In progress |
-| **3. Creature Definition** | Define creature data structures (nodes/connections) and muscle contraction timings encoded as a genome. | Planned |
-| **4. Animation** | Hardcode a test genome to verify that the muscle timings produce movement in the physics world. | Planned |
-| **5. Fitness Evaluation** | Implement a function to measure the horizontal distance traveled over a fixed timeframe. | Planned |
-| **6. Population Generation** | Write the logic to spawn a population of creatures with randomized genomic data. | Planned |
-| **7. Genetic Algorithm** | Create selection and mutation logic to preserve the best performers and generate varied descendants. | Planned |
-| **8. Evolution Loop** | Automate the cycle of simulation, evaluation, and reproduction to observe emergent behavior. | Planned |
+| **2. Physics Engine** | Develop Verlet integration for node movement, implement spring constraints, gravity, and ground collision detection. | Complete |
+| **3. Creature Definition** | Define creature data structures (nodes/connections) and muscle contraction timings encoded as a genome. | Complete |
+| **4. Animation** | Hardcode a test genome to verify that the muscle timings produce movement in the physics world. | Complete |
+| **5. Fitness Evaluation** | Implement a function to measure the horizontal distance traveled over a fixed timeframe. | Complete |
+| **6. Population Generation** | Write the logic to spawn a population of creatures with randomized genomic data. | Complete |
+| **7. Genetic Algorithm** | Create selection and mutation logic to preserve the best performers and generate varied descendants. | Complete |
+| **8. Evolution Loop** | Automate the cycle of simulation, evaluation, and reproduction to observe emergent behavior. | Complete |
 
 
 ---
