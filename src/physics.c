@@ -1,7 +1,7 @@
 #include "../include/physics.h"
 
-#define FRICTION_COEFFICIENT 0.9f
-#define BOUNCE_FACTOR 0.3f
+#define FRICTION_COEFFICIENT 0.8f
+#define BOUNCE_FACTOR 0.5f
 
 void verlet(struct body *b, float dt){
     float temp_x = b->x;
@@ -37,20 +37,23 @@ void spring(struct spring s){
    // find distance
    float dis_x = s.node_b->x - s.node_a->x;
    float dis_y = s.node_b->y - s.node_a->y;
-   float inv_distance = fast_sqrt((dis_x * dis_x) + (dis_y * dis_y));
-   float distance = 1.0f / inv_distance;
-   // calculate error
-   float error_ratio = (s.L - distance)*inv_distance * 0.5f; 
+   float dist_sq = (dis_x * dis_x) + (dis_y * dis_y);
+   if (dist_sq > 0.0001f){
+        float inv_distance = fast_sqrt(dist_sq);
+        float distance = 1.0f / inv_distance;
+        // calculate error
+        float error_ratio = (s.L - distance)*inv_distance * 0.5f; 
 
-   // calculate move amount
-   float offset_x = dis_x * error_ratio;
-   float offset_y = dis_y * error_ratio;
+        // calculate move amount
+        float offset_x = dis_x * error_ratio;
+        float offset_y = dis_y * error_ratio;
 
-   // update nodes
-   s.node_a->x -= offset_x;
-   s.node_a->y -= offset_y;
-   s.node_b->x += offset_x;
-   s.node_b->y += offset_y;
+        // update nodes
+        s.node_a->x -= offset_x;
+        s.node_a->y -= offset_y;
+        s.node_b->x += offset_x;
+        s.node_b->y += offset_y;
+   }
 }
 
 void ground_friction(struct body *node, float floor_height){
