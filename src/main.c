@@ -33,7 +33,7 @@ int main(int argc, char* argv[]) {
     float base_lengths[POP_SIZE][MAX_SPRINGS];
 
     for (int p = 0; p < POP_SIZE; p++) {
-        create_tri_creature(&population[p]);
+        create_worm_creature(&population[p]);
 
         start_center_x[p] = 0.0f;
         for (int i = 0; i < population[p].node_count; i++) {
@@ -101,7 +101,7 @@ int main(int argc, char* argv[]) {
                 }
                 population[p].dna = best_dna;
                 if (p > 0){
-                    mutate_genome(&population[p].dna);
+                    mutate_genome(&population[p].dna, population[p].spring_count);
                 }
                 current_fitness[p] = 0.0f;
             }

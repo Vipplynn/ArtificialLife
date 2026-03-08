@@ -20,4 +20,5 @@ struct creature {
 
 
 void create_tri_creature(struct creature *creature);
-void mutate_genome(struct genome *g);
+void mutate_genome(struct genome *g, int spring_count);
+void create_worm_creature(struct creature *creature);
