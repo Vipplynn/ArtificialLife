@@ -109,20 +109,21 @@ make
 
 ```
 artificial/
-├── src/
-│   ├── main.c          # Game loop and entry point
-│   ├── physics.c       # Verlet integration, nodes, springs
-│   ├── creature.c      # Creature definition and genome
-│   ├── evolution.c     # Population, selection, mutation
-│   └── render.c        # SDL3 rendering
+├── CMakeLists.txt
+├── LICENSE
+├── README.md
+├── build
 ├── include/
-│   ├── physics.h
-│   ├── creature.h
-│   ├── evolution.h
-│   └── render.h
-├── vendored/
-│   └── SDL/            # SDL3 source (git submodule)
-└── CMakeLists.txt
+│   ├── creature.h
+│   ├── draw.h
+│   └── physics.h
+├── src/
+│   ├── creature.c
+│   ├── draw.c
+│   ├── main.c
+│   └── physics.c
+└── vendored
+    └── SDL/
 ```
 
 ---
