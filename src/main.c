@@ -38,21 +38,41 @@ int main(int argc, char* argv[]){
 
     struct creature creature = {};
 
+    struct genome best_dna = {};
+
     create_tri_creature(&creature);
     float floor_level = 450.0f;
     
     float camera_x = 0.0f;
     float simulation_time = 0.0f;
     float base_L = creature.spring_arr[0].L;
+    
     float base_node_x = creature.node_arr[0].x;
+    float best_fitness = -10000.0f; 
+
+    int generation = 0;
+
+    float base_lengths[creature.spring_count];
+    for (int i = 0; i < creature.spring_count; i++){
+        base_lengths[i] = creature.spring_arr[i].L;
+    }
+
+    float start_x[3], start_y[3];
+    for (int i = 0; i < 3; i++){
+        start_x[i] = creature.node_arr[i].x;
+        start_y[i] = creature.node_arr[i].y;
+    }
+
+
     SDL_Renderer *renderer = NULL;
     renderer = SDL_CreateRenderer(window, NULL);
+    SDL_SetRenderVSync(renderer, 1);
     while (!done) {
         SDL_Event event;
 
 
  
-        bool present = SDL_RenderPresent(renderer);
+        //bool present = SDL_RenderPresent(renderer);
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_EVENT_QUIT) {
                 done = true;
@@ -62,17 +82,49 @@ int main(int argc, char* argv[]){
             //ball.acc_y = 9.81f;
             //verlet(&ball, 0.016f);
             //ground_friction(&ball, floor_level);
+        if (simulation_time > 10.0f) {
+            float current_fitness = creature.node_arr[0].x - start_x[0];
+            
+            if (current_fitness > best_fitness){
+                best_fitness = current_fitness;
+
+                best_dna = creature.dna;
+            }
+
+            for (int i = 0; i < 3; i++){
+                creature.node_arr[i].x = start_x[i];
+                creature.node_arr[i].y = start_y[i];
+                creature.node_arr[i].prev_x = start_x[i];
+                creature.node_arr[i].prev_y = start_y[i];
+                creature.node_arr[i].acc_x = 0;
+                creature.node_arr[i].acc_y = 0;
+            }
+            simulation_time = 0.0f;
+            generation++;
+
+            creature.dna = best_dna;
+            mutate_genome(&creature.dna);
+        }
             float avg_x = (creature.node_arr[0].x + creature.node_arr[1].x + creature.node_arr[2].x) / 3.0f;
 
             camera_x = avg_x - 320.f;
 
             for (int i = 0; i < 3; i++){
-                creature.node_arr[i].acc_y = 25.0f;
+                creature.node_arr[i].acc_y = 981.0f;
             }            
             for (int i = 0; i < 3; i++){
                 verlet(&creature.node_arr[i], 0.016f);
             }
-            creature.spring_arr[0].L = base_L + sinf(simulation_time * 5.0f) * 10.0f;
+
+            for (int i = 0; i < creature.spring_count; i++){
+                float freq = creature.dna.frequencies[i];
+                float amp = creature.dna.amplitudes[i];
+                float phase = creature.dna.phases[i];
+
+                creature.spring_arr[i].L = base_lengths[i] + sinf(simulation_time * freq + phase) * amp;
+            } 
+            
+
             for (int i = 0; i < 3; i++){
                 spring(creature.spring_arr[i]);
             }
@@ -98,8 +150,19 @@ int main(int argc, char* argv[]){
                 drawCircle(renderer, (int)(creature.node_arr[i].x - camera_x), (int)creature.node_arr[i].y, (int)creature.node_arr[i].radius);
             }
 
-            printf("Node 0 distance travelled: %f\n", creature.node_arr[0].x - base_node_x);
+            printf("Node 0 distance travelled: %f\n", creature.node_arr[0].x - start_x[0]);
+            char gen_text[32], fit_text[32], best_fit[32];
+            float displacement = creature.node_arr[0].x - start_x[0];
+            snprintf(gen_text, sizeof(gen_text), "Generation: %d", generation);
+            snprintf(fit_text, sizeof(fit_text), "Fitness: %.2f", displacement);
+            snprintf(best_fit, sizeof(best_fit), "Best Fitness: %.2f", best_fitness);
+
+            SDL_RenderDebugText(renderer, 10.0f, 10.0f, gen_text);
+            SDL_RenderDebugText(renderer, 10.0f, 30.0f, fit_text);
+            SDL_RenderDebugText(renderer, 10.0f, 50.0f, best_fit);
+
             simulation_time += 0.016f;
+
             SDL_RenderPresent(renderer);
 
     }

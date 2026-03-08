@@ -1,4 +1,5 @@
 #include "../include/creature.h"
+#include <stdlib.h>
 
 void create_tri_creature(struct creature *creature){
    creature->node_count = 3;
@@ -52,4 +53,29 @@ void create_tri_creature(struct creature *creature){
 
        creature->spring_arr[i].L = 1.0f / inv_dist;
    }
+
+
+   // DNA initialization
+   
+   for (int i = 0; i < creature->spring_count; i++){
+        creature->dna.frequencies[i] = 5.0f;
+        creature->dna.amplitudes[i] = 10.0f;
+        creature->dna.phases[i] = i * (2.0f * 3.14159f / 3.0f);
+   }
 }
+
+
+void mutate_genome(struct genome *g){
+    for (int i = 0; i < 3; i++){
+        // 20% for mutation
+        if ((rand() % 100) < 20){
+            g->frequencies[i] += ((rand() % 100) / 50.0f - 1.0f) * 0.5f;
+
+            g->amplitudes[i] += ((rand() % 100) / 50.0f - 1.0f) * 2.0f;
+
+            g->phases[i] += ((rand() % 100) / 50.0f - 1.0f) * 0.5f;
+
+        }
+    }
+}
+
