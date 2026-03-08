@@ -1,13 +1,14 @@
-#include "../include/physics.h"
+#include "../include/creature.h"
 #include <stdint.h>
-#define FRICTION_COEFFICIENT 0.8f
+#define FRICTION_COEFFICIENT 0.95f
 #define BOUNCE_FACTOR 0.85f
+#define REPULSION_THRESHOLD 11.00f
 
 void verlet(struct body *b, float dt){
     float temp_x = b->x;
     float temp_y = b->y;
     
-    float friction = 0.999f;
+    float friction = 0.98f;
     // calculate new pos
     //b->x = 2.0*b->x - b->prev_x + b->acc_x * (dt * dt);
     //b->y = 2.0*b->y - b->prev_y + b->acc_y * (dt * dt);
@@ -46,7 +47,7 @@ void spring(struct spring s){
         float inv_distance = fast_sqrt(dist_sq);
         float distance = 1.0f / inv_distance;
         // calculate error
-        float error_ratio = (s.L - distance)*inv_distance * 0.5f; 
+        float error_ratio = (s.L - distance)*inv_distance * 0.55f; 
 
         // calculate move amount
         float offset_x = dis_x * error_ratio;
@@ -72,5 +73,35 @@ void ground_friction(struct body *node, float floor_height){
         float y_prev_new = node->y + (node->prev_y - node->y) * (-1 * BOUNCE_FACTOR);
 
         node->prev_y = y_prev_new;
+    }
+}
+
+void centroid_repulsion(struct creature *creature){
+    float repulsion_stiffness = 0.1f;
+    float centroid_x = 0.0f;
+    float centroid_y = 0.0f;
+    for (int i = 0; i < creature->node_count; i++){
+        centroid_x += creature->node_arr[i].x;
+        centroid_y += creature->node_arr[i].y;
+    }
+    centroid_x /= creature->node_count;
+    centroid_y /= creature->node_count;    
+
+    for (int i = 0; i < creature->node_count; i++){
+        float dx = creature->node_arr[i].x - centroid_x;
+        float dy = creature->node_arr[i].y - centroid_y;
+    
+        float inv_length = fast_sqrt((dx * dx) + (dy * dy));
+        if (inv_length > 0.0001f) {
+            float length = 1.0f / inv_length;
+            dx *= inv_length;
+            dy *= inv_length;
+
+            if (length < REPULSION_THRESHOLD){
+                float push = REPULSION_THRESHOLD - length;
+                creature->node_arr[i].x += (dx * push * repulsion_stiffness);
+                creature->node_arr[i].y += (dy * push * repulsion_stiffness);
+            }
+        }
     }
 }

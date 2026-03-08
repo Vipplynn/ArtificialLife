@@ -1,3 +1,5 @@
+struct creature;
+
 struct body {
     float x, y;
     float prev_x, prev_y;
@@ -20,4 +22,4 @@ void spring(struct spring s);
 
 void ground_friction(struct body *node, float floor_height);
 
-
+void centroid_repulsion(struct creature *creature);

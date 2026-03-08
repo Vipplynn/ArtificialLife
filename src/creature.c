@@ -58,9 +58,9 @@ void create_tri_creature(struct creature *creature){
    // DNA initialization
    
    for (int i = 0; i < creature->spring_count; i++){
-        creature->dna.frequencies[i] = 5.0f;
-        creature->dna.amplitudes[i] = 10.0f;
-        creature->dna.phases[i] = i * (2.0f * 3.14159f / 3.0f);
+        creature->dna.frequencies[i] = 2.0f + ((rand() % 100) / 100.0f) * 8.0f;
+        creature->dna.amplitudes[i] = 5.0f + ((rand() % 100) / 100.0f) * 15.0f;
+        creature->dna.phases[i] = ((rand() % 100 / 100.0f) * (2.0f * 3.14159f));
    }
 }
 

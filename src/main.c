@@ -3,11 +3,14 @@
 #include <SDL3/SDL_render.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include <math.h>
+#include <time.h>
 
-//#include "../include/physics.h"
 #include "../include/creature.h"
+#define POP_SIZE 4
 int main(int argc, char* argv[]){
+    srand(time(NULL));
     SDL_Window *window;
     bool done = false;
 
@@ -24,26 +27,26 @@ int main(int argc, char* argv[]){
         SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Could not create window: %s\n", SDL_GetError());
         return 1;
     }
-/*
-    struct body ball = {
-        .x = 320.0f,
-        .y = 100.0f,
-        .prev_x = 320.0f,
-        .prev_y = 100.0f,
-        .acc_x = 0.0f,
-        .acc_y = 0.0f,
-        .radius = 15.0f
-    };
-*/
-
     struct creature creature = {};
-
+    //struct creature population[POP_SIZE];
     struct genome best_dna = {};
 
     create_tri_creature(&creature);
+    float start_center_x = 0.0f;
+    for (int i = 0; i < creature.node_count; i++){
+        start_center_x += creature.node_arr[i].x;
+    }
+    start_center_x /= creature.node_count;
+
+    float start_x[3], start_y[3];
+    for (int i = 0; i < creature.node_count; i++){
+        start_x[i] = creature.node_arr[i].x;
+        start_y[i] = creature.node_arr[i].y;
+    }
     float floor_level = 450.0f;
     
-    float camera_x = 0.0f;
+    float camera_x = 0.0f;    
+    int physics_speed = 1;
     float simulation_time = 0.0f;
     float base_L = creature.spring_arr[0].L;
     
@@ -56,13 +59,7 @@ int main(int argc, char* argv[]){
     for (int i = 0; i < creature.spring_count; i++){
         base_lengths[i] = creature.spring_arr[i].L;
     }
-
-    float start_x[3], start_y[3];
-    for (int i = 0; i < 3; i++){
-        start_x[i] = creature.node_arr[i].x;
-        start_y[i] = creature.node_arr[i].y;
-    }
-
+    float current_fitness = 0.0f;
 
     SDL_Renderer *renderer = NULL;
     renderer = SDL_CreateRenderer(window, NULL);
@@ -70,21 +67,31 @@ int main(int argc, char* argv[]){
     while (!done) {
         SDL_Event event;
 
-
  
         //bool present = SDL_RenderPresent(renderer);
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_EVENT_QUIT) {
                 done = true;
             }
+            switch (event.type) {
+                case SDL_EVENT_KEY_DOWN:
+                    if (event.key.key == SDLK_UP){
+                        if (physics_speed < 20){
+                            physics_speed++;
+                        }
+                    }
+                    else if (event.key.key == SDLK_DOWN){
+                        if (physics_speed > 1){
+                            physics_speed--;
+                        }
+                    }
+                    break;
+            }
         }
         // logic, present frame, etc
-            //ball.acc_y = 9.81f;
-            //verlet(&ball, 0.016f);
-            //ground_friction(&ball, floor_level);
-        if (simulation_time > 10.0f) {
-            float current_fitness = creature.node_arr[0].x - start_x[0];
-            
+ 
+        if (simulation_time > 20.0f) { 
+                      
             if (current_fitness > best_fitness){
                 best_fitness = current_fitness;
 
@@ -105,17 +112,18 @@ int main(int argc, char* argv[]){
             creature.dna = best_dna;
             mutate_genome(&creature.dna);
         }
+        for (int i = 0; i < physics_speed; i++){
             float avg_x = (creature.node_arr[0].x + creature.node_arr[1].x + creature.node_arr[2].x) / 3.0f;
 
             camera_x = avg_x - 320.f;
 
             for (int i = 0; i < 3; i++){
-                creature.node_arr[i].acc_y = 981.0f;
+                creature.node_arr[i].acc_y = 500.0f;
             }            
             for (int i = 0; i < 3; i++){
                 verlet(&creature.node_arr[i], 0.016f);
             }
-
+           
             for (int i = 0; i < creature.spring_count; i++){
                 float freq = creature.dna.frequencies[i];
                 float amp = creature.dna.amplitudes[i];
@@ -128,8 +136,19 @@ int main(int argc, char* argv[]){
             for (int i = 0; i < 3; i++){
                 spring(creature.spring_arr[i]);
             }
+
+            centroid_repulsion(&creature);
+
             for (int i = 0; i < 3; i++){
                 ground_friction(&creature.node_arr[i], floor_level);
+            }
+            simulation_time += 0.016f;
+
+            float current_sum = 0.0f;
+            for (int i = 0; i < creature.node_count; i++){
+                current_sum += creature.node_arr[i].x;
+            }
+            current_fitness = (current_sum / creature.node_count) - start_center_x;
             }
 
             // rendering
@@ -138,11 +157,30 @@ int main(int argc, char* argv[]){
 
             SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
+            // speed text
+            char speed_text[16];
+            snprintf(speed_text, sizeof(speed_text), "Speed: %dx", physics_speed);
+            SDL_RenderDebugText(renderer, 10, 70, speed_text);
+
             // floor line
             SDL_RenderLine(renderer, 0, floor_level, 640, floor_level);
 
-            // draw ball
-            //drawCircle(renderer, (int)(ball.x - camera_x), (int)ball.y, (int)ball.radius);
+            // markers
+            int spacing = 500;
+            int start_marker = (int)floorf((camera_x - start_center_x) / spacing);
+
+            for (int i = start_marker; i < start_marker + 3; i++){
+                float m_pos = start_center_x + (i * spacing);
+                float screen_x = m_pos - camera_x;
+
+                SDL_RenderLine(renderer, screen_x, floor_level, screen_x, floor_level - 50.0f);
+
+                char marker_label[16];
+                snprintf(marker_label, sizeof(marker_label), "%dm", i * 10);
+                SDL_RenderDebugText(renderer, screen_x + 5.0f, floor_level - 45.0f, marker_label);
+            }
+            
+            // draw creature
             for (int i = 0; i < 3; i++){
                 SDL_RenderLine(renderer, creature.spring_arr[i].node_a->x - camera_x, creature.spring_arr[i].node_a->y, creature.spring_arr[i].node_b->x - camera_x, creature.spring_arr[i].node_b->y);
             }
@@ -152,16 +190,16 @@ int main(int argc, char* argv[]){
 
             printf("Node 0 distance travelled: %f\n", creature.node_arr[0].x - start_x[0]);
             char gen_text[32], fit_text[32], best_fit[32];
-            float displacement = creature.node_arr[0].x - start_x[0];
+
             snprintf(gen_text, sizeof(gen_text), "Generation: %d", generation);
-            snprintf(fit_text, sizeof(fit_text), "Fitness: %.2f", displacement);
+            snprintf(fit_text, sizeof(fit_text), "Fitness: %.2f", current_fitness);
             snprintf(best_fit, sizeof(best_fit), "Best Fitness: %.2f", best_fitness);
 
             SDL_RenderDebugText(renderer, 10.0f, 10.0f, gen_text);
             SDL_RenderDebugText(renderer, 10.0f, 30.0f, fit_text);
             SDL_RenderDebugText(renderer, 10.0f, 50.0f, best_fit);
 
-            simulation_time += 0.016f;
+            //simulation_time += 0.016f;
 
             SDL_RenderPresent(renderer);
 
