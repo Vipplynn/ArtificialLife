@@ -9,7 +9,7 @@ A companion bare-metal port targets an ARM microcontroller, driving a TFT displa
 ## Demo
 
 > ⚙️ *In progress — demo video will be added once evolution is functional.*
-
+![preview of evolution sim](/evolution_sim.gif)
 ---
 
 ## Projects
