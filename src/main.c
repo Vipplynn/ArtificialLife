@@ -61,7 +61,7 @@ int main(int argc, char* argv[]){
             //ground_friction(&ball, floor_level);
 
             for (int i = 0; i < 3; i++){
-                creature.node_arr[i].acc_y = 9.81f;
+                creature.node_arr[i].acc_y = 600.0f;
             }            
             for (int i = 0; i < 3; i++){
                 verlet(&creature.node_arr[i], 0.016f);

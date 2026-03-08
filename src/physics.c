@@ -1,16 +1,18 @@
 #include "../include/physics.h"
-
+#include <stdint.h>
 #define FRICTION_COEFFICIENT 0.8f
 #define BOUNCE_FACTOR 0.5f
 
 void verlet(struct body *b, float dt){
     float temp_x = b->x;
     float temp_y = b->y;
-
+    
+    float friction = 0.999f;
     // calculate new pos
-    b->x = 2.0*b->x - b->prev_x + b->acc_x * (dt * dt);
-    b->y = 2.0*b->y - b->prev_y + b->acc_y * (dt * dt);
-
+    //b->x = 2.0*b->x - b->prev_x + b->acc_x * (dt * dt);
+    //b->y = 2.0*b->y - b->prev_y + b->acc_y * (dt * dt);
+    b->x = b->x + (b->x - b->prev_x) * friction + b->acc_x * (dt * dt);
+    b->y = b->y + (b->y - b->prev_y) * friction + b->acc_y * (dt * dt);
 
     b->prev_x = temp_x;
     b->prev_y = temp_y;
@@ -20,14 +22,16 @@ void verlet(struct body *b, float dt){
 }
 
 float fast_sqrt(float number){
-    long i;
+    int32_t i;
     float x2, y;
     const float threehalfs = 1.5F;
 
     x2 = number * 0.5F;
     y = number;
-    i = *(long *)&y;
+    i = *(int32_t *)&y;
     i = 0x5f3759df - (i >> 1);
+
+    y = *(float *)&i;
     y = y * (threehalfs - (x2 * y * y));
 
     return y;
