@@ -21,3 +21,4 @@ Thumbs.db
 *.dylib
 *.dll
 *.exe
+.aider*
