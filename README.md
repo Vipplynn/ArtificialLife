@@ -58,7 +58,7 @@ This project is a deliberate exercise in constraint-driven engineering: fitting 
 **Status:**
 | Component | Status |
 |---|---|
-| QEMU bare-metal boot | Planned |
+| QEMU bare-metal boot | In progress |
 | SPI / TFT driver | Planned |
 | Fixed memory pool allocator | Planned |
 | Physics engine port | Planned |
@@ -112,7 +112,7 @@ artificial/
 ├── CMakeLists.txt
 ├── LICENSE
 ├── README.md
-├── build
+├── build/
 ├── include/
 │   ├── creature.h
 │   ├── draw.h
