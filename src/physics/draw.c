@@ -1,10 +1,20 @@
-#include <SDL3/SDL.h>
+#include "../../include/draw.h"
 
-void drawPixel(SDL_Renderer* renderer, int x, int y){
-    SDL_RenderPoint(renderer, (float)x, (float)y);
+#ifndef BAREMETAL
+#include <SDL3/SDL.h>
+#endif
+
+void drawPixel(Renderer* renderer, int x, int y){
+#ifdef BAREMETAL
+    // TODO: implement register level SPI/TFT pixel draw here
+    (void)renderer;
+#else
+    // Desktop version using SDL
+    SDL_RenderPoint((SDL_Renderer*)renderer, (float)x, (float)y);
+#endif
 }
 
-void drawCircle(SDL_Renderer *renderer, int center_x, int center_y, int radius){
+void drawCircle(Renderer *renderer, int center_x, int center_y, int radius){
     int x = 0;
     int y = -radius;
     int p = -radius;

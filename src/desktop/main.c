@@ -7,7 +7,7 @@
 #include <math.h>
 #include <time.h>
 
-#include "../include/creature.h"
+#include "../../include/creature.h"
 
 #define POP_SIZE 4
 
