@@ -1,6 +1,7 @@
 # Build directory
 # This is where CMake generates all the temporary build files and your final executable.
 build/
+build_arm/
 
 # IDE and Editor files
 .vscode/
